@@ -16,6 +16,18 @@ bot = Bot(token=TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher(bot)
 
 
+@dp.message_handler(commands='start')
+async def send_search(message: types.Message):
+    text = 'Телеграм бот для поиска вакансий "python developer" на jobs.tut.by. \r\n\n' \
+           '/search - выводит список ключевых слов поиска. \r\n ' \
+           '/list - выводит список вакансий по ключевым словам поиска.\r\n\n' \
+           'При отправке любого сообщения боту(python, developer),' \
+           ' это сообщение сохранится как ключевое слово поиска. \r\n' \
+           'При повторной отправке такого же сообщения, ключевое слово удаляется из списка.\r\n\n' \
+           'При добавлении новой вакансии на сайте, подходящей по ключевым словам поиска, бот пришлет эту вакансию.'
+    await message.answer(text=text)
+
+
 @dp.message_handler(commands='list')
 async def send_list(message: types.Message):
     search_words = find_id_search(message.chat.id)

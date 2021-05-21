@@ -49,7 +49,7 @@ def find_all_search():
 async def process_search(message):
     search_exist = True
 
-    word = search_words.select().where(search_words.c.word == message.text)
+    word = search_words.select().where(search_words.c.word == message.text, search_words.c.chatid == message.chat.id)
     result = conn.execute(word)
 
     list_result = []
@@ -57,7 +57,7 @@ async def process_search(message):
         search_exist = False
 
     if search_exist:
-        del_word = search_words.delete().where(search_words.c.word == message.text)
+        del_word = search_words.delete().where(search_words.c.word == message.text, search_words.c.chatid == message.chat.id)
         conn.execute(del_word)
         await message.answer(f'Строка поиска "{message.text}" удалена')
     elif not search_exist:
