@@ -31,6 +31,9 @@ async def send_search(message: types.Message):
 @dp.message_handler(commands='list')
 async def send_list(message: types.Message):
     search_words = find_id_search(message.chat.id)
+    words_dict = {}
+    for word in search_words:
+        words_dict[word.word] = 0
     jobs = find_all_jobs()
     for job in jobs:
         job_title = job.title
@@ -39,16 +42,26 @@ async def send_list(message: types.Message):
             j_t = job_title.lower()
             if j_t.find(search_word) >= 0:
                 message_text = f'Строка поиска {search_word} \r\n Найдено {utils.markdown.hlink(job_title, job.url)}'
+                words_dict[word.word] = 1
 
                 await message.answer(text=message_text, parse_mode=ParseMode.HTML)
+    if words_dict:
+        for key in words_dict:
+            if words_dict[key] == 0:
+                await message.answer(text=f'По строке поиска "{key}" не найдено ни одной вакансии.')
+    else:
+        await message.answer(text="У вас нет ни одной строки для поиска.")
 
 
 @dp.message_handler(commands='search')
 async def send_search(message: types.Message):
     search_words = find_id_search(message.chat.id)
-    await message.answer(text="Строки для поиска:")
-    for word in search_words:
-        await message.answer(text=word.word)
+    if search_words:
+        await message.answer(text="Строки для поиска:")
+        for word in search_words:
+            await message.answer(text=word.word)
+    else:
+        await message.answer(text="У вас нет ни одной строки для поиска.")
 
 
 @dp.message_handler()
